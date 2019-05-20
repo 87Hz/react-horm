@@ -4,7 +4,8 @@
   "description": "React H(ookF)orm.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "babel src/js --out-dir src/gen --watch",
+    "build": "babel src/js --out-dir src/gen"
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,16 @@
   "bugs": {
     "url": "https://github.com/87Hz/react-horm/issues"
   },
-  "homepage": "https://github.com/87Hz/react-horm#readme"
+  "homepage": "https://github.com/87Hz/react-horm#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/plugin-transform-react-jsx": "^7.3.0",
+    "@babel/preset-env": "^7.4.4",
+    "shadow-cljs": "^2.8.37"
+  },
+  "dependencies": {
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  }
 }
