@@ -12,25 +12,19 @@
 ;                                      (range num-children)))]
 ;     (MyDefaultComponent #js {:children (mapv MyComponent children-props)})))
 
-; (defn ^:export mount-root []
-;   (render (root) (.getElementById js/document "app")))
-
 (defn stateExample []
   (let [[val set-val!] (useState 200)]
     (html [:div [:button {:onClick (fn [] (set-val! inc))} "+"]
                 [:button {:onClick (fn [] (set-val! dec))} "-"]
                 val])))
 
-    ; (createElement "div" nil (createElement "button" #js {:onClick (fn [] (set-val! inc))} "+")
-    ;                          (createElement "button" #js {:onClick (fn [] (set-val! dec))} "-")
-    ;                          (createElement "div" nil val))))
-
 (defn demo []
-  (createElement stateExample))
+  (html [:div {}
+          ^:inline (stateExample)))
 
-(defn ^:export mount-demo []
+(defn ^:export mount []
   (render (demo) (.getElementById js/document "app")))
 
 (defn ^:export main []
   (js/console.log "app init" horm/Horm)
-  (mount-demo))
+  (mount))
