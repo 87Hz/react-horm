@@ -22,8 +22,8 @@
         js/undefined)
       [])
     (e "div" nil
-      (e "button" #js {:onClick (fn [] (set-val! inc))} "+")
-      (e "button" #js {:onClick (fn [] (set-val! dec))} "-")
+      (e "button" #js {:onClick #(set-val! inc)} "+")
+      (e "button" #js {:onClick #(set-val! dec)} "-")
       val)))
 
 (defn demo []
@@ -31,7 +31,7 @@
     (e stateExample)))
 
 (defn ^:export mount []
-  (render (root) (.getElementById js/document "app")))
+  (render (demo) (.getElementById js/document "app")))
 
 (defn ^:export main []
   (mount))
