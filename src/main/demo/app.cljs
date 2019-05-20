@@ -1,7 +1,6 @@
 (ns demo.app
   (:require ["react-dom" :refer (render)]
-            ["react" :refer (createElement useContext useState)]
-            [sablono.core :as html :refer-macros [html]]
+            ["react" :refer (useState createElement)]
             ; ["./bar" :refer (MyComponent) :default MyDefaultComponent]
             [horm :as horm]))
 
@@ -14,17 +13,16 @@
 
 (defn stateExample []
   (let [[val set-val!] (useState 200)]
-    (html [:div [:button {:onClick (fn [] (set-val! inc))} "+"]
-                [:button {:onClick (fn [] (set-val! dec))} "-"]
-                val])))
+    (createElement "div" nil
+                   (createElement "button" #js {:onClick (fn [] (set-val! inc))} "+")
+                   (createElement "button" #js {:onClick (fn [] (set-val! dec))} "-")
+                   val)))
 
 (defn demo []
-  (html [:div {}
-          ^:inline (stateExample)))
+  (createElement stateExample))
 
 (defn ^:export mount []
   (render (demo) (.getElementById js/document "app")))
 
 (defn ^:export main []
-  (js/console.log "app init" horm/Horm)
   (mount))

@@ -5,7 +5,7 @@
  :nrepl  {:port 8450}
 
  :dependencies
-         [[sablono "0.8.6"]]
+         []
 
  :builds {:app
           {:target     :browser
