@@ -1,15 +1,15 @@
 (ns demo.app
   (:require ["react-dom" :refer (render)]
             ["react" :refer (useState createContext useContext useEffect) :rename {createElement e}]
-            ; ["./bar" :refer (MyComponent) :default MyDefaultComponent]
+            ["./bar" :refer (MyComponent) :default MyDefaultComponent]
             [horm :as horm]))
 
-; (defn root []
-;   (let [num-children 5
-;         children-props (clj->js (map hash-map
-;                                      (repeat num-children :key)
-;                                      (range num-children)))]
-;     (MyDefaultComponent #js {:children (mapv MyComponent children-props)})))
+(defn root []
+  (let [num-children 5
+        children-props (clj->js (map hash-map
+                                     (repeat num-children :key)
+                                     (range num-children)))]
+    (MyDefaultComponent #js {:children (mapv MyComponent children-props)})))
 
 (def ctx (createContext 0))
 
@@ -31,7 +31,7 @@
     (e stateExample)))
 
 (defn ^:export mount []
-  (render (demo) (.getElementById js/document "app")))
+  (render (root) (.getElementById js/document "app")))
 
 (defn ^:export main []
   (mount))
