@@ -2,3 +2,4 @@
 /.shadow-cljs
 /public/js
 /.nrepl-port
+/src/gen
