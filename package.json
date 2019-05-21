@@ -2,11 +2,9 @@
   "name": "react-horm",
   "version": "1.0.1",
   "description": "React H(ookF)orm.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "concurrently \"yarn watch\" \"shadow-cljs watch app\"",
-    "watch": "babel src/js --out-dir src/gen --watch",
-    "build": "babel src/js --out-dir src/gen"
+    "start": "docz dev"
   },
   "repository": {
     "type": "git",
@@ -14,7 +12,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/87Hz/react-horm/issues"
   },
@@ -24,11 +22,13 @@
     "@babel/core": "^7.4.4",
     "@babel/plugin-transform-react-jsx": "^7.3.0",
     "@babel/preset-env": "^7.4.4",
-    "concurrently": "^4.1.0",
-    "shadow-cljs": "^2.8.37"
-  },
-  "dependencies": {
+    "@types/react": "^16.8.18",
+    "docz": "^1.2.0",
+    "docz-theme-default": "^1.2.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6"
+  },
+  "dependencies": {
+    "ramda": "^0.26.1"
   }
 }

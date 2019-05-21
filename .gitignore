@@ -1,6 +1,3 @@
 /node_modules
-/.shadow-cljs
-/public/js
-/.nrepl-port
-/src/gen
 /dist
+/.docz
