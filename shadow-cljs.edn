@@ -1,11 +1,10 @@
 {:source-paths
-         ["src/main"
-          "src/gen"]
+ ["src/main"
+  "src/gen"]
 
  :nrepl  {:port 8450}
 
- :dependencies
-         []
+ :dependencies []
 
  :builds {:app
           {:target     :browser
@@ -17,4 +16,12 @@
            :devtools   {:http-root    "public"
                         :http-handler shadow.http.push-state/handle
                         :http-port    8280
-                        :after-load   demo.app/mount-root}}}}
+                        :after-load   demo.app/mount-root}}
+
+          :lib
+          {:target     :node-library
+           :exports    {:hormCtx horm/horm-context
+                        :Horm    horm/Horm}
+
+           :output-dir "dist"
+           :output-to  "dist/index.js"}}}
