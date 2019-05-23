@@ -2,21 +2,21 @@ import { useContext, ChangeEventHandler, FocusEventHandler } from 'react';
 import R from 'ramda';
 import { HormContext, HormCtx } from './Horm';
 
-interface FieldHormBag<V> {
-  value: V;
+interface FieldHormBag<FV> {
+  value: FV[keyof FV];
   touched: boolean;
-  setValue: (val: V) => void;
+  setValue: (val: FV[keyof FV]) => void;
   setTouched: (val: boolean) => void;
 }
 
-interface FieldHtmlProps<N, V> {
-  name: N;
-  value: V;
+interface FieldHtmlProps<FV> {
+  name: keyof FV;
+  value: FV[keyof FV];
   onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   onFocus: FocusEventHandler;
 }
 
-export function useField<FV, N extends keyof FV>(name: N) {
+export function useField<FV>(name: keyof FV) {
   const ctx = useContext<HormCtx<FV>>(HormContext);
   const value = R.prop(name, ctx.values);
 
@@ -27,7 +27,7 @@ export function useField<FV, N extends keyof FV>(name: N) {
   const setValue = (val: any) => ctx.setValues(R.assoc(name.toString(), val));
   const setTouched = (val: boolean) => ctx.setTouched(R.assoc(name.toString(), val));
 
-  const hormBag: FieldHormBag<FV[N]> = {
+  const hormBag: FieldHormBag<FV> = {
     value,
     touched,
     setValue,
@@ -45,7 +45,7 @@ export function useField<FV, N extends keyof FV>(name: N) {
     setTouched(true);
   };
 
-  const htmlProps: FieldHtmlProps<N, FV[N]> = {
+  const htmlProps: FieldHtmlProps<FV> = {
     name,
     value,
     onChange,

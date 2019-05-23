@@ -2,11 +2,6 @@ import React from 'react';
 import * as Yup from 'yup';
 import { Horm, useForm, useField } from '../src';
 
-type FormValues = {
-  email: string;
-  password: string;
-};
-
 export const validationSchema = Yup.object().shape({
   email: Yup.string()
     .email()
@@ -17,18 +12,19 @@ export const validationSchema = Yup.object().shape({
     .required(),
 });
 
-export const SimpleForm = () => {
-  const initialValues = { email: '123', password: 'pass' };
+const initialValues = { email: '123', password: 'pass', counter: 1 };
+type FormValues = typeof initialValues;
 
+export const SimpleForm = () => {
   return (
-    <Horm<FormValues>
+    <Horm
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={console.log}
       render={() => {
-        const form = useForm<FormValues>();
-        const emailField = useField<FormValues, 'email'>('email');
-        const passwordField = useField<FormValues, 'password'>('password');
+        const form = useForm();
+        const emailField = useField<FormValues>('email');
+        const passwordField = useField<FormValues>('password');
 
         return (
           <form {...form.htmlProps}>
