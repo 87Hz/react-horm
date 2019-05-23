@@ -1,40 +1,56 @@
-import { useContext, ChangeEventHandler } from "react";
-import { prop } from "ramda";
-import { HormContext } from "./Horm";
+import { useContext, ChangeEventHandler, FocusEventHandler } from 'react';
+import R from 'ramda';
+import { HormContext, HormCtx } from './Horm';
 
-interface FieldHormBag {
-  value: any;
+interface FieldHormBag<V> {
+  value: V;
   touched: boolean;
-  setValue: (val: any) => void;
+  setValue: (val: V) => void;
   setTouched: (val: boolean) => void;
 }
 
-interface FieldHtmlProps {
-  name: string;
-  value: any;
+interface FieldHtmlProps<N, V> {
+  name: N;
+  value: V;
   onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  onFocus: FocusEventHandler;
 }
 
-export const useField = (name: string) => {
-  const ctx = useContext(HormContext);
+export function useField<FV, N extends keyof FV>(name: N) {
+  const ctx = useContext<HormCtx<FV>>(HormContext);
+  const value = R.prop(name, ctx.values);
 
-  const value = prop(name, ctx.values);
-  const touched = prop(name, ctx.touched);
-  const setValue = ctx.setFieldValue(name);
-  const setTouched = ctx.setFieldTouched(name);
+  // ----------------------------------------------------
+  // hormBag
+  //
+  const touched: boolean = R.propOr(false, name.toString(), ctx.touched);
+  const setValue = (val: any) => ctx.setValues(R.assoc(name.toString(), val));
+  const setTouched = (val: boolean) => ctx.setTouched(R.assoc(name.toString(), val));
 
-  const harmBag: FieldHormBag = {
+  const hormBag: FieldHormBag<FV[N]> = {
     value,
     touched,
     setValue,
-    setTouched
+    setTouched,
   };
 
-  const htmlProps: FieldHtmlProps = {
+  // ----------------------------------------------------
+  // htmlProps
+  //
+  const onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (e) => {
+    setValue(e.currentTarget.value);
+  };
+
+  const onFocus: FocusEventHandler = () => {
+    setTouched(true);
+  };
+
+  const htmlProps: FieldHtmlProps<N, FV[N]> = {
     name,
     value,
-    onChange: e => setValue(e.currentTarget.value)
+    onChange,
+    onFocus,
   };
 
-  return { harmBag, htmlProps };
-};
+  return { hormBag, htmlProps };
+}

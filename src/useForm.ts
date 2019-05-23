@@ -1,30 +1,33 @@
-import { useContext, FormEventHandler } from "react";
-import { HormContext, MapOf } from "./Horm";
+import { useContext, FormEventHandler } from 'react';
+import R from 'ramda';
+import { HormContext, HormCtx } from './Horm';
 
-interface FormHormBag {
-  values: MapOf<any>;
-  touched: MapOf<boolean>;
-  setValues: (val: MapOf<any>) => void;
-  setTouched: (val: MapOf<boolean>) => void;
-}
+type FormHormBag<FV> = Pick<
+  HormCtx<FV>,
+  'dirty' | 'errors' | 'initialValues' | 'isValid' | 'setErrors' | 'setTouched' | 'setValues' | 'touched' | 'values'
+>;
 
 interface FormHtmlProps {
   onSubmit: FormEventHandler;
 }
 
-export const useForm = () => {
-  const ctx = useContext(HormContext);
+export function useForm<FV>() {
+  const ctx = useContext<HormCtx<FV>>(HormContext);
 
-  const harmBag: FormHormBag = {
-    values: ctx.values,
-    touched: ctx.touched,
-    setValues: ctx.setValues,
-    setTouched: ctx.setTouched
-  };
+  // ----------------------------------------------------
+  // hormBag
+  //
+  const hormBag: FormHormBag<FV> = R.pickAll(
+    ['dirty', 'errors', 'initialValues', 'isValid', 'setErrors', 'setTouched', 'setValues', 'touched', 'values'],
+    ctx
+  );
 
+  // ----------------------------------------------------
+  // htmlProps
+  //
   const htmlProps: FormHtmlProps = {
-    onSubmit: ctx.onSubmit
+    onSubmit: ctx.onSubmit,
   };
 
-  return { harmBag, htmlProps };
-};
+  return { hormBag, htmlProps };
+}

@@ -26,7 +26,6 @@
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.3.3",
-    "@types/ramda": "^0.26.8",
     "@types/react": "^16.8.18",
     "@types/yup": "^0.26.13",
     "babel-plugin-ramda": "^2.0.0",
@@ -39,6 +38,7 @@
     "yup": "^0.27.0"
   },
   "dependencies": {
+    "@types/ramda": "^0.26.8",
     "ramda": "^0.26.1"
   }
 }

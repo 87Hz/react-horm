@@ -1,60 +1,76 @@
-import React, { ReactNode, useState, FormEventHandler } from "react";
-import { assoc } from "ramda";
+import React, { ReactNode, useState, FormEventHandler, useEffect } from 'react';
+import R from 'ramda';
+import { Schema } from 'yup';
 
-export type MapOf<T = string> = { [K: string]: T };
-
-export interface HormProps {
-  initialValues: any;
-  onSubmit: (values: MapOf<any>) => void;
-
-  validationSchema?: any;
+export type HormProps<FV> = {
+  children?: ReactNode;
   enableReinitialization?: boolean;
+  initialValues: FV;
+  onSubmit: (vals: FV) => void;
+  render?: React.FC;
   validateOnBlur?: boolean;
   validateOnChange?: boolean;
-  render?: React.FC;
-  children?: ReactNode;
-}
+  validationSchema?: Schema<FV>;
+};
 
-export interface HormCtx {
-  values: MapOf<any>;
-  touched: MapOf<boolean>;
-  setValues: (val: MapOf<any>) => void;
-  setTouched: (val: MapOf<boolean>) => void;
-  setFieldValue: (name: string) => (val: any) => void;
-  setFieldTouched: (name: string) => (val: boolean) => void;
+export interface HormCtx<FV> extends Pick<HormProps<FV>, 'initialValues'> {
+  dirty: Record<keyof FV, boolean>;
+  errors: Record<keyof FV, string[]>;
+  isValid: boolean;
   onSubmit: FormEventHandler;
+  setErrors: React.Dispatch<React.SetStateAction<Record<keyof FV, string[]>>>;
+  setTouched: React.Dispatch<React.SetStateAction<Record<keyof FV, boolean>>>;
+  setValues: React.Dispatch<React.SetStateAction<Record<keyof FV, any>>>;
+  touched: Record<keyof FV, boolean>;
+  values: FV;
 }
 
-export const HormContext = React.createContext<HormCtx>(null);
+export const HormContext = React.createContext<any>(null);
 
-export const Horm = (props: HormProps) => {
+// const validate = async (errorSetter: any, values: any, validationSchema: Schema<any>) => {
+//   try {
+//     await validationSchema.validate(values, { abortEarly: false });
+//   } catch (e) {
+//     console.log('e', e);
+//   }
+// };
+
+export function Horm<FV>(props: HormProps<FV>) {
   const { render: Render } = props;
   const children = Render ? <Render /> : props.children;
 
   // states
+  const [initialValues, setInitialValues] = useState(props.initialValues);
+  const [dirty, setDirty] = useState<Record<any, boolean>>(R.mapObjIndexed(R.F, props.initialValues));
+  const [errors, setErrors] = useState<Record<any, string[]>>(R.mapObjIndexed(R.always([]), props.initialValues));
+  const [touched, setTouched] = useState<Record<any, boolean>>(R.mapObjIndexed(R.F, props.initialValues));
   const [values, setValues] = useState(props.initialValues);
-  const [touched, setTouched] = useState({});
+  const [initialErrors, setInitialErrors] = useState<Record<any, string[]>>(
+    R.mapObjIndexed(R.always([]), props.initialValues)
+  );
 
-  const setFieldValue = (name: string) => (val: any) =>
-    setValues(assoc(name, val));
+  const isValid = R.pipe(
+    R.values,
+    R.all(R.isEmpty)
+  )(errors);
 
-  const setFieldTouched = (name: string) => (val: boolean) =>
-    setTouched(assoc(name, val));
-
-  const onSubmit: FormEventHandler = e => {
+  const onSubmit: FormEventHandler = (e) => {
     e.preventDefault();
     props.onSubmit(values);
   };
 
-  const ctx: HormCtx = {
-    values,
-    touched,
-    setValues,
+  const ctx: HormCtx<FV> = {
+    dirty,
+    errors,
+    initialValues,
+    isValid,
+    onSubmit,
+    setErrors,
     setTouched,
-    setFieldValue,
-    setFieldTouched,
-    onSubmit
+    setValues,
+    touched,
+    values,
   };
 
   return <HormContext.Provider value={ctx}>{children}</HormContext.Provider>;
-};
+}
