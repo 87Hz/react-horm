@@ -1,4 +1,4 @@
-/node_modules
-/dist
-/.docz
-/*.log
+/**/node_modules
+/**/dist
+/**/.docz
+/**/*.log
