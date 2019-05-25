@@ -1,25 +1,6 @@
-import { useContext, ChangeEventHandler, FocusEventHandler } from 'react';
+import { useContext, ChangeEvent } from 'react';
 import { prop } from 'ramda';
 import { HormContext, HormCtx } from './context';
-import { FieldStateSetter } from './types';
-
-interface FieldHormBag {
-  value: any;
-  initialValue: any;
-  dirty: boolean;
-  touched: boolean;
-
-  setTouched: FieldStateSetter<boolean>;
-  setValue: FieldStateSetter;
-}
-
-interface FieldHtmlProps {
-  name: string;
-  value: any;
-
-  onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
-  onFocus: FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
-}
 
 export function useField(name: string) {
   const ctx = useContext(HormContext) as HormCtx;
@@ -27,7 +8,7 @@ export function useField(name: string) {
   // ----------------------------------------------------
   // hormBag
   //
-  const hormBag: FieldHormBag = {
+  const hormBag = {
     value: prop(name, ctx.values),
     initialValue: prop(name, ctx.initialValues),
     dirty: prop(name, ctx.dirty),
@@ -40,11 +21,13 @@ export function useField(name: string) {
   // ----------------------------------------------------
   // htmlProps
   //
-  const htmlProps: FieldHtmlProps = {
+  const htmlProps = {
     name,
     value: hormBag.value,
 
-    onChange: (e) => hormBag.setValue(e.currentTarget.value),
+    onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      hormBag.setValue(e.currentTarget.value),
+
     onFocus: () => hormBag.setTouched(true),
   };
 

@@ -1,11 +1,5 @@
-import { useContext, FormEventHandler } from 'react';
+import { useContext, FormEvent } from 'react';
 import { HormContext, HormCtx } from './context';
-
-type FormHormBag = Pick<HormCtx, 'dirty' | 'errors' | 'touched' | 'values'>;
-
-interface FormHtmlProps {
-  onSubmit: FormEventHandler;
-}
 
 export function useForm() {
   const ctx = useContext(HormContext) as HormCtx;
@@ -13,7 +7,7 @@ export function useForm() {
   // ----------------------------------------------------
   // hormBag
   //
-  const hormBag: FormHormBag = {
+  const hormBag = {
     dirty: ctx.dirty,
     errors: ctx.errors,
     touched: ctx.touched,
@@ -23,12 +17,10 @@ export function useForm() {
   // ----------------------------------------------------
   // htmlProps
   //
-  const htmlProps: FormHtmlProps = {
-    onSubmit: (e) => {
+  const htmlProps = {
+    onSubmit: (e: FormEvent) => {
       e.preventDefault();
-      if (ctx.isValid) {
-        ctx.onSubmit(ctx.values);
-      }
+      ctx.isValid && ctx.onSubmit(ctx.values);
     },
   };
 
