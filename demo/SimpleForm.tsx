@@ -12,10 +12,9 @@ export const validationSchema = Yup.object().shape({
     .required(),
 });
 
-const initialValues = { email: '123', password: 'pass', counter: 1 };
-type FormValues = typeof initialValues;
-
 export const SimpleForm = () => {
+  const initialValues = { email: '123', password: 'pass' };
+
   return (
     <Horm
       initialValues={initialValues}
@@ -23,8 +22,8 @@ export const SimpleForm = () => {
       onSubmit={console.log}
       render={() => {
         const form = useForm();
-        const emailField = useField<FormValues>('email');
-        const passwordField = useField<FormValues>('password');
+        const emailField = useField('email');
+        const passwordField = useField('password');
 
         return (
           <form {...form.htmlProps}>
@@ -42,7 +41,9 @@ export const SimpleForm = () => {
                 <h3>passwordField.hormBag</h3>
                 <pre>{JSON.stringify(passwordField.hormBag, undefined, 2)}</pre>
                 <h3>passwordField.htmlProps</h3>
-                <pre>{JSON.stringify(passwordField.htmlProps, undefined, 2)}</pre>
+                <pre>
+                  {JSON.stringify(passwordField.htmlProps, undefined, 2)}
+                </pre>
               </div>
 
               <div>

@@ -1,55 +1,51 @@
 import { useContext, ChangeEventHandler, FocusEventHandler } from 'react';
-import R from 'ramda';
-import { HormContext, HormCtx } from './Horm';
+import { prop } from 'ramda';
+import { HormContext, HormCtx } from './context';
+import { FieldStateSetter } from './types';
 
-interface FieldHormBag<FV> {
-  value: FV[keyof FV];
+interface FieldHormBag {
+  value: any;
+  initialValue: any;
+  dirty: boolean;
   touched: boolean;
-  setValue: (val: FV[keyof FV]) => void;
-  setTouched: (val: boolean) => void;
+
+  setTouched: FieldStateSetter<boolean>;
+  setValue: FieldStateSetter;
 }
 
-interface FieldHtmlProps<FV> {
-  name: keyof FV;
-  value: FV[keyof FV];
+interface FieldHtmlProps {
+  name: string;
+  value: any;
+
   onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
-  onFocus: FocusEventHandler;
+  onFocus: FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
 }
 
-export function useField<FV>(name: keyof FV) {
-  const ctx = useContext<HormCtx<FV>>(HormContext);
-  const value = R.prop(name, ctx.values);
+export function useField(name: string) {
+  const ctx = useContext(HormContext) as HormCtx;
 
   // ----------------------------------------------------
   // hormBag
   //
-  const touched: boolean = R.propOr(false, name.toString(), ctx.touched);
-  const setValue = (val: any) => ctx.setValues(R.assoc(name.toString(), val));
-  const setTouched = (val: boolean) => ctx.setTouched(R.assoc(name.toString(), val));
+  const hormBag: FieldHormBag = {
+    value: prop(name, ctx.values),
+    initialValue: prop(name, ctx.initialValues),
+    dirty: prop(name, ctx.dirty),
+    touched: prop(name, ctx.touched),
 
-  const hormBag: FieldHormBag<FV> = {
-    value,
-    touched,
-    setValue,
-    setTouched,
+    setValue: ctx.setValues(name),
+    setTouched: ctx.setTouched(name),
   };
 
   // ----------------------------------------------------
   // htmlProps
   //
-  const onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (e) => {
-    setValue(e.currentTarget.value);
-  };
-
-  const onFocus: FocusEventHandler = () => {
-    setTouched(true);
-  };
-
-  const htmlProps: FieldHtmlProps<FV> = {
+  const htmlProps: FieldHtmlProps = {
     name,
-    value,
-    onChange,
-    onFocus,
+    value: hormBag.value,
+
+    onChange: (e) => hormBag.setValue(e.currentTarget.value),
+    onFocus: () => hormBag.setTouched(true),
   };
 
   return { hormBag, htmlProps };
