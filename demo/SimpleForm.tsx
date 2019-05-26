@@ -2,7 +2,7 @@ import React from 'react';
 import * as Yup from 'yup';
 import { Horm, useForm, useField } from '../src';
 
-export const validationSchema = Yup.object().shape({
+const validationSchema = Yup.object().shape({
   email: Yup.string()
     .email()
     .required(),
@@ -12,6 +12,10 @@ export const validationSchema = Yup.object().shape({
     .required(),
 });
 
+const validationFn = (values: Record<string, any>) => {
+  return { email: ['hello'] };
+};
+
 export const SimpleForm = () => {
   const initialValues = { email: '123', password: 'pass' };
 
@@ -19,6 +23,8 @@ export const SimpleForm = () => {
     <Horm
       initialValues={initialValues}
       validationSchema={validationSchema}
+      // validationFn={validationFn}
+      isInitialValid
       onSubmit={console.log}
       render={() => {
         const form = useForm();

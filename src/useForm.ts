@@ -11,6 +11,7 @@ export function useForm() {
     dirty: ctx.dirty,
     errors: ctx.errors,
     isValid: ctx.isValid,
+    isValidating: ctx.isValidating,
     touched: ctx.touched,
     values: ctx.values,
   };

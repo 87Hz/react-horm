@@ -1,4 +1,4 @@
-import { Schema, ValidationError, boolean } from 'yup';
+import { Schema, ValidationError } from 'yup';
 import { prop, pluck, zipObj } from 'ramda';
 import { FormState } from './types';
 
@@ -21,27 +21,39 @@ export async function validateOnSchema(
 }
 
 // ---------------------------------------------------------
-// TODO: CustomValiationFn
+// ValiationFn
 //
-export type ValidationFn = (formValues: FormState) => boolean;
+export type SyncValidationFn = (formValues: FormState) => FormState<string[]>;
+
+export type AsyncValidationFn = (
+  formValues: FormState
+) => Promise<FormState<string[]>>;
+
+export type ValidationFn = SyncValidationFn | AsyncValidationFn;
 
 export async function validateOnFn(
+  values: FormState,
   validationFn: ValidationFn
-): Promise<Record<string, string[]>> {
-  return {};
+): Promise<FormState<string[]>> {
+  return await validationFn(values);
 }
 
 // ---------------------------------------------------------
 // ValidateFormValues
 //
 export const validateFormValues = async (params: {
-  formValues: FormState;
+  valuesToValidate: FormState;
   validationSchema?: Schema<FormState>;
+  validationFn?: ValidationFn;
 }) => {
-  const { formValues, validationSchema } = params;
+  const { valuesToValidate, validationSchema, validationFn } = params;
 
   if (validationSchema) {
-    return await validateOnSchema(formValues, validationSchema);
+    return await validateOnSchema(valuesToValidate, validationSchema);
+  }
+
+  if (validationFn) {
+    return await validateOnFn(valuesToValidate, validationFn);
   }
 
   return {};

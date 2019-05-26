@@ -1,9 +1,18 @@
-import React, { ReactNode, useState } from 'react';
-import { assoc, curry, propEq, complement } from 'ramda';
+import React, { ReactNode, useState, useEffect } from 'react';
+import {
+  assoc,
+  curry,
+  propEq,
+  complement,
+  pipe,
+  values,
+  isEmpty,
+  all,
+} from 'ramda';
 import { Schema } from 'yup';
 import { FormState } from './types';
 import { HormCtx, HormContext } from './context';
-import { validateFormValues } from './validation';
+import { validateFormValues, ValidationFn } from './validation';
 
 export type HormProps = {
   initialValues: FormState;
@@ -11,12 +20,11 @@ export type HormProps = {
   render?: React.FC;
   children?: ReactNode;
   isInitialValid?: boolean;
-  // happens in handleBlur and setTouched
-  validateOnBlur?: boolean;
-  // happens in setValues
-  validateOnChange?: boolean;
-  enableReinitialization?: boolean;
+  validateOnBlur?: boolean; // happens in handleBlur and setTouched
+  validateOnChange?: boolean; // happens in setValues
+  enableReinitialize?: boolean;
   validationSchema?: Schema<FormState>;
+  validationFn?: ValidationFn;
 };
 
 const propNotEq = complement(propEq);
@@ -27,6 +35,7 @@ export function Horm(props: HormProps) {
     isInitialValid = false,
     validateOnBlur = true,
     validateOnChange = true,
+    enableReinitialize = false,
   } = props;
   const children = Render ? <Render /> : props.children;
 
@@ -36,6 +45,7 @@ export function Horm(props: HormProps) {
   const [initialValues, setInitialValues] = useState(props.initialValues);
   const [formValues, setFormValues] = useState(props.initialValues);
   const [isValid, setIsValid] = useState(isInitialValid);
+  const [isValidating, setIsValidating] = useState(false);
   const [formDirty, setFormDirty] = useState({});
   const [formErrors, setFormErrors] = useState({});
   const [formTouched, setFormTouched] = useState({});
@@ -43,6 +53,46 @@ export function Horm(props: HormProps) {
   // ----------------------------------------------------
   // Effects
   //
+  useEffect(() => {
+    if (enableReinitialize) {
+      reset(props.initialValues);
+    }
+  }, [props.initialValues]);
+
+  // ----------------------------------------------------
+  // Reset
+  //
+  const reset = (initialValues: FormState) => {
+    setInitialValues(initialValues);
+    setFormValues(initialValues);
+    setIsValid(isInitialValid);
+    setIsValidating(false);
+    setFormDirty({});
+    setFormErrors({});
+    setFormTouched({});
+  };
+
+  // ----------------------------------------------------
+  // Validations
+  //
+  const runValidation = async (valuesToValidate: FormState = formValues) => {
+    setIsValidating(true);
+
+    const errors = await validateFormValues({
+      valuesToValidate,
+      validationSchema: props.validationSchema,
+      validationFn: props.validationFn,
+    });
+
+    const isValid = pipe(
+      values,
+      all(isEmpty)
+    )(errors);
+
+    setIsValid(isValid);
+    setFormErrors(errors);
+    setIsValidating(false);
+  };
 
   // ----------------------------------------------------
   // Return
@@ -52,49 +102,31 @@ export function Horm(props: HormProps) {
     errors: formErrors,
     initialValues,
     isValid,
+    isValidating,
     touched: formTouched,
     values: formValues,
 
     onSubmit: props.onSubmit,
+    validate: runValidation,
 
     setErrors: curry((name: string, val: string[]) => {
       setFormErrors(assoc(name, val));
     }),
 
-    setTouched: curry(async (name: string, val: boolean) => {
+    setTouched: curry((name: string, val: boolean) => {
       setFormTouched(assoc(name, val));
-
-      if (validateOnBlur) {
-        const errors = await validateFormValues({
-          formValues,
-          validationSchema: props.validationSchema,
-        });
-        setFormErrors(errors);
-      }
+      validateOnBlur && runValidation();
     }),
 
-    setValues: curry(async (name: string, val: any) => {
+    setValues: curry((name: string, val: any) => {
       const newValues = assoc(name, val, formValues);
       setFormValues(newValues);
       setFormDirty(assoc(name, propNotEq(name, val, initialValues)));
-
-      if (validateOnChange) {
-        const errors = await validateFormValues({
-          formValues: newValues,
-          validationSchema: props.validationSchema,
-        });
-        setFormErrors(errors);
-      }
+      validateOnChange && runValidation(newValues);
     }),
 
-    handleBlur: async () => {
-      if (validateOnBlur) {
-        const errors = await validateFormValues({
-          formValues,
-          validationSchema: props.validationSchema,
-        });
-        setFormErrors(errors);
-      }
+    handleBlur: () => {
+      validateOnBlur && runValidation();
     },
   };
 

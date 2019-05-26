@@ -6,9 +6,11 @@ export interface HormCtx {
   errors: FormState<string[]>;
   initialValues: FormState;
   isValid: boolean;
+  isValidating: boolean;
   touched: FormState<boolean>;
   values: FormState;
 
+  validate: () => void;
   onSubmit: (vals: FormState) => void;
   setErrors: FormStateSetter<string[]>;
   setTouched: FormStateSetter<boolean>;

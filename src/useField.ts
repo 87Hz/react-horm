@@ -1,5 +1,5 @@
 import { useContext, ChangeEvent } from 'react';
-import { prop, propOr } from 'ramda';
+import { prop, propOr, isEmpty } from 'ramda';
 import { HormContext, HormCtx } from './context';
 
 export function useField(name: string) {
@@ -8,15 +8,18 @@ export function useField(name: string) {
   // ----------------------------------------------------
   // hormBag
   //
+  const errors = propOr([], name, ctx.errors);
   const hormBag = {
     value: prop(name, ctx.values),
     initialValue: prop(name, ctx.initialValues),
     dirty: propOr(false, name, ctx.dirty),
     touched: propOr(false, name, ctx.touched),
-    errors: propOr([], name, ctx.errors),
+    errors,
+    isValid: isEmpty(errors),
 
     setValue: ctx.setValues(name),
     setTouched: ctx.setTouched(name),
+    setErrors: ctx.setErrors(name),
   };
 
   // ----------------------------------------------------
