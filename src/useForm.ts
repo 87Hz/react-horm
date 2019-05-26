@@ -10,6 +10,7 @@ export function useForm() {
   const hormBag = {
     dirty: ctx.dirty,
     errors: ctx.errors,
+    isValid: ctx.isValid,
     touched: ctx.touched,
     values: ctx.values,
   };

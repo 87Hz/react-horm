@@ -1,18 +1,14 @@
-import { Schema, ValidationError } from 'yup';
+import { Schema, ValidationError, boolean } from 'yup';
 import { prop, pluck, zipObj } from 'ramda';
+import { FormState } from './types';
 
-import { FormValues } from './Horm';
-
-/* ---------------------------------------------------------
- * YupSchema
- *
- */
+// ---------------------------------------------------------
+// YupSchema
+//
 export async function validateOnSchema(
-  values: FormValues,
-  validationSchema?: Schema<FormValues>
-): Promise<Record<string, string[]>> {
-  if (!validationSchema) return {};
-
+  values: FormState,
+  validationSchema: Schema<FormState>
+): Promise<FormState<string[]>> {
   try {
     await validationSchema.validate(values, { abortEarly: false });
     return {};
@@ -24,18 +20,29 @@ export async function validateOnSchema(
   }
 }
 
-/* ---------------------------------------------------------
- * TODO: CustomValiationFn
- *
- */
-export type ValidationFn = (
-  fieldValue: any,
-  formValues: Record<string, any>
-) => boolean;
+// ---------------------------------------------------------
+// TODO: CustomValiationFn
+//
+export type ValidationFn = (formValues: FormState) => boolean;
 
 export async function validateOnFn(
-  values: FormValues,
-  validationFns: Record<string, ValidationFn>
+  validationFn: ValidationFn
 ): Promise<Record<string, string[]>> {
   return {};
 }
+
+// ---------------------------------------------------------
+// ValidateFormValues
+//
+export const validateFormValues = async (params: {
+  formValues: FormState;
+  validationSchema?: Schema<FormState>;
+}) => {
+  const { formValues, validationSchema } = params;
+
+  if (validationSchema) {
+    return await validateOnSchema(formValues, validationSchema);
+  }
+
+  return {};
+};

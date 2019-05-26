@@ -1,8 +1,9 @@
 import React, { ReactNode, useState } from 'react';
-import { assoc, curry } from 'ramda';
+import { assoc, curry, propEq, complement } from 'ramda';
 import { Schema } from 'yup';
 import { FormState } from './types';
 import { HormCtx, HormContext } from './context';
+import { validateFormValues } from './validation';
 
 export type HormProps = {
   initialValues: FormState;
@@ -10,11 +11,15 @@ export type HormProps = {
   render?: React.FC;
   children?: ReactNode;
   isInitialValid?: boolean;
+  // happens in handleBlur and setTouched
   validateOnBlur?: boolean;
+  // happens in setValues
   validateOnChange?: boolean;
   enableReinitialization?: boolean;
   validationSchema?: Schema<FormState>;
 };
+
+const propNotEq = complement(propEq);
 
 export function Horm(props: HormProps) {
   const {
@@ -40,21 +45,6 @@ export function Horm(props: HormProps) {
   //
 
   // ----------------------------------------------------
-  // Handlers
-  //
-  const setValues = curry((name: string, val: any) => {
-    setFormValues(assoc(name, val));
-  });
-
-  const setTouched = curry((name: string, val: boolean) => {
-    setFormTouched(assoc(name, val));
-  });
-
-  const setErrors = curry((name: string, val: string[]) => {
-    setFormErrors(assoc(name, val));
-  });
-
-  // ----------------------------------------------------
   // Return
   //
   const ctx: HormCtx = {
@@ -66,9 +56,46 @@ export function Horm(props: HormProps) {
     values: formValues,
 
     onSubmit: props.onSubmit,
-    setErrors,
-    setTouched,
-    setValues,
+
+    setErrors: curry((name: string, val: string[]) => {
+      setFormErrors(assoc(name, val));
+    }),
+
+    setTouched: curry(async (name: string, val: boolean) => {
+      setFormTouched(assoc(name, val));
+
+      if (validateOnBlur) {
+        const errors = await validateFormValues({
+          formValues,
+          validationSchema: props.validationSchema,
+        });
+        setFormErrors(errors);
+      }
+    }),
+
+    setValues: curry(async (name: string, val: any) => {
+      const newValues = assoc(name, val, formValues);
+      setFormValues(newValues);
+      setFormDirty(assoc(name, propNotEq(name, val, initialValues)));
+
+      if (validateOnChange) {
+        const errors = await validateFormValues({
+          formValues: newValues,
+          validationSchema: props.validationSchema,
+        });
+        setFormErrors(errors);
+      }
+    }),
+
+    handleBlur: async () => {
+      if (validateOnBlur) {
+        const errors = await validateFormValues({
+          formValues,
+          validationSchema: props.validationSchema,
+        });
+        setFormErrors(errors);
+      }
+    },
   };
 
   return <HormContext.Provider value={ctx}>{children}</HormContext.Provider>;
