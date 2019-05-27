@@ -1,20 +1,35 @@
 ---
-name: SimpleForm
+name: WithValidationFn
 ---
 
-import { SimpleForm } from './SimpleForm';
+import { WithValidationFn } from './WithValidationFn';
 
-# SimpleForm
+# WithValidationFn
 
-<SimpleForm />
+<WithValidationFn />
 
 ```tsx
+const validationFn: ValidationFn = (values) => {
+  let errors: FormState<string[]> = { email: [], password: [] };
+
+  if (values.email.length === 0) {
+    errors.email.push('Email cannot be empty');
+  }
+
+  if (values.password.length === 0) {
+    errors.password.push('Password cannot be empty');
+  }
+
+  return errors;
+};
+
 const initialValues = { email: '123', password: 'pass' };
 
-export const SimpleForm = () => {
+export const WithValidationFn = () => {
   return (
     <Horm
       initialValues={initialValues}
+      validationFn={validationFn}
       isInitialValid
       onSubmit={console.log}
       render={() => {

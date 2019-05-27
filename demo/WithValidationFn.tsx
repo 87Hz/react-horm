@@ -1,20 +1,27 @@
----
-name: SimpleForm
----
+import React from 'react';
+import { Horm, useForm, useField, FormState, ValidationFn } from '../src';
 
-import { SimpleForm } from './SimpleForm';
+const validationFn: ValidationFn = (values) => {
+  let errors: FormState<string[]> = { email: [], password: [] };
 
-# SimpleForm
+  if (values.email.length === 0) {
+    errors.email.push('Email cannot be empty');
+  }
 
-<SimpleForm />
+  if (values.password.length === 0) {
+    errors.password.push('Password cannot be empty');
+  }
 
-```tsx
+  return errors;
+};
+
 const initialValues = { email: '123', password: 'pass' };
 
-export const SimpleForm = () => {
+export const WithValidationFn = () => {
   return (
     <Horm
       initialValues={initialValues}
+      validationFn={validationFn}
       isInitialValid
       onSubmit={console.log}
       render={() => {
@@ -55,4 +62,3 @@ export const SimpleForm = () => {
     />
   );
 };
-```

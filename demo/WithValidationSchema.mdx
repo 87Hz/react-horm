@@ -1,20 +1,31 @@
 ---
-name: SimpleForm
+name: WithValidationSchema
 ---
 
-import { SimpleForm } from './SimpleForm';
+import { WithValidationSchema } from './WithValidationSchema';
 
-# SimpleForm
+# WithValidationSchema
 
-<SimpleForm />
+<WithValidationSchema />
 
 ```tsx
+const validationSchema = Yup.object().shape({
+  email: Yup.string()
+    .email()
+    .required(),
+
+  password: Yup.string()
+    .min(6)
+    .required(),
+});
+
 const initialValues = { email: '123', password: 'pass' };
 
-export const SimpleForm = () => {
+export const WithValidationSchema = () => {
   return (
     <Horm
       initialValues={initialValues}
+      validationSchema={validationSchema}
       isInitialValid
       onSubmit={console.log}
       render={() => {

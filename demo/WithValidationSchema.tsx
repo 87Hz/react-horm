@@ -1,20 +1,24 @@
----
-name: SimpleForm
----
+import React from 'react';
+import * as Yup from 'yup';
+import { Horm, useForm, useField } from '../src';
 
-import { SimpleForm } from './SimpleForm';
+const validationSchema = Yup.object().shape({
+  email: Yup.string()
+    .email()
+    .required(),
 
-# SimpleForm
+  password: Yup.string()
+    .min(6)
+    .required(),
+});
 
-<SimpleForm />
-
-```tsx
 const initialValues = { email: '123', password: 'pass' };
 
-export const SimpleForm = () => {
+export const WithValidationSchema = () => {
   return (
     <Horm
       initialValues={initialValues}
+      validationSchema={validationSchema}
       isInitialValid
       onSubmit={console.log}
       render={() => {
@@ -55,4 +59,3 @@ export const SimpleForm = () => {
     />
   );
 };
-```

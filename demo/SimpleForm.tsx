@@ -1,29 +1,12 @@
 import React from 'react';
-import * as Yup from 'yup';
 import { Horm, useForm, useField } from '../src';
 
-const validationSchema = Yup.object().shape({
-  email: Yup.string()
-    .email()
-    .required(),
-
-  password: Yup.string()
-    .min(6)
-    .required(),
-});
-
-const validationFn = (values: Record<string, any>) => {
-  return { email: ['hello'] };
-};
+const initialValues = { email: '123', password: 'pass' };
 
 export const SimpleForm = () => {
-  const initialValues = { email: '123', password: 'pass' };
-
   return (
     <Horm
       initialValues={initialValues}
-      validationSchema={validationSchema}
-      // validationFn={validationFn}
       isInitialValid
       onSubmit={console.log}
       render={() => {
