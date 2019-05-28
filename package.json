@@ -1,13 +1,18 @@
 {
   "name": "react-horm",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "React H(ookF)orm.",
   "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "docz dev",
-    "dist": "yarn dist:clean && yarn dist:compile",
+    "dist": "yarn dist:clean && yarn dist:compile && yarn dist:types",
+    "dist:types": "tsc",
     "dist:compile": "babel src --out-dir dist --extensions \".ts,.tsx\"",
-    "dist:clean": "rimraf dist/"
+    "dist:clean": "rimraf dist/",
+    "prepublishOnly": "yarn dist"
   },
   "repository": {
     "type": "git",
@@ -26,19 +31,19 @@
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.3.3",
+    "@types/ramda": "^0.26.8",
     "@types/react": "^16.8.18",
     "@types/yup": "^0.26.13",
     "babel-plugin-ramda": "^2.0.0",
-    "docz": "^1.2.0",
     "docz-theme-default": "^1.2.0",
+    "docz": "^1.2.0",
     "prettier": "^1.17.1",
-    "react": "^16.8.6",
     "rimraf": "^2.6.3",
     "typescript": "^3.4.5",
     "yup": "^0.27.0"
   },
-  "dependencies": {
-    "@types/ramda": "^0.26.8",
-    "ramda": "^0.26.1"
+  "peerDependencies": {
+    "ramda": "^0.26.1",
+    "react": "^16.8.6"
   }
 }

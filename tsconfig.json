@@ -1,5 +1,5 @@
 {
-  "exclude": ["dist", "node_modules", ".docz"],
+  "exclude": ["dist", "node_modules", ".docz", "demo"],
   "compilerOptions": {
     "alwaysStrict": true,
     "declaration": true,
@@ -17,7 +17,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "outDir": "dist",
-    "rootDir": ".",
+    "rootDir": "src",
     "sourceMap": true,
     "strict": true,
     "strictFunctionTypes": true,
