@@ -14,7 +14,7 @@ export const CountDown = () => {
       <br />
       <br />
 
-      <button type="button" disabled={val2 > 0} onClick={restart2}>
+      <button type="button" onClick={restart2}>
         CountDown2 {val2}
       </button>
     </>
