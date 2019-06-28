@@ -78,7 +78,7 @@ const validationFn: ValidationFn = (values) => {
 };
 ```
 
-### useField (Hook)
+### useForm (Hook)
 
 ```ts
 // Example
@@ -100,7 +100,7 @@ const loginForm = useForm();
 
 - onSubmit
 
-### useForm (Hook)
+### useField (Hook)
 
 ```ts
 // Example
